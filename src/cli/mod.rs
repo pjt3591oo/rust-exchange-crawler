@@ -2,9 +2,9 @@ use clap::{App, Arg};
 
 #[derive(Debug)]
 pub struct Params {
-  symbol: String,
-  count: i32,
-  exchange: String,
+  pub symbol: String,
+  pub count: i32,
+  pub exchange: String,
 }
 
 pub fn parse() -> Result<Params, ()> {
@@ -47,7 +47,7 @@ pub fn parse() -> Result<Params, ()> {
   }
 
   Ok(Params {
-    symbol,
+    symbol: symbol.to_uppercase(),
     count,
     exchange,
   })
