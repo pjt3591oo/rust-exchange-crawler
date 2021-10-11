@@ -16,13 +16,23 @@ pub struct Crawler {
   pub stocks: Vec<StockPacket>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TradeOrderRoot {
+  data:TradeOrder,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TradeOrder {
+  crncCd: String,
+}
+
 impl CrawlerInterface<Crawler> for Crawler {
   fn new(count: i32, symbol: &String) -> Result<String, reqwest::Error> {
-    let url = format!("https://crix-api-cdn.upbit.com/v1/crix/candles/minutes/30?code=CRIX.UPBIT.KRW-{}&count={}&ciqrandom=1633651016830", &symbol, count, );
     let client = reqwest::blocking::Client::builder()
-      .danger_accept_invalid_certs(true)
-      .build().unwrap();
+    .danger_accept_invalid_certs(true)
+    .build().unwrap();
 
+    let url = format!("https://crix-api-cdn.upbit.com/v1/crix/candles/minutes/30?code=CRIX.UPBIT.KRW-{}&count={}&ciqrandom=1633651016830", &symbol, count, );
     let raw_text: String = client.get(url).send().unwrap().text().unwrap();
 
     Ok(raw_text)

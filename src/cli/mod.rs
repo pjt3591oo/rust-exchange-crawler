@@ -28,7 +28,7 @@ pub fn parse() -> Result<Params, ()> {
       .short('e')
       .long("exchange")
       .value_name("EXCHANGE")
-      .about("upbit, bithumb, cobit")
+      .about("upbit, coinone, cobit")
       .required(true))
     .get_matches();
 
