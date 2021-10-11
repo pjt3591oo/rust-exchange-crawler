@@ -1,21 +1,19 @@
 use reqwest;
 use serde::{Serialize, Deserialize};
 
-pub use super::CrawlerInterface;
+pub use super::{CrawlerInterface, StockPacket};
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct StockPacket {
-  // pub candleDateTimeKst:  &'b str,
-  // pub candleDateTime: &'a str,
-  // pub code:  &'c str,
-  pub candleAccTradeVolume:  f64,
-  pub candleAccTradePrice: f64,
-  pub openingPrice:  f64,
-  pub tradePrice:  f64,
-  pub highPrice:  f64,
-  pub lowPrice:  f64,
-  pub timestamp: i128,
-  pub unit:  i128,
+struct OriginalPacketRoot {
+  data: OriginalPacket,
+}
+#[derive(Serialize, Deserialize, Debug)]
+struct OriginalPacket {
+  o: Vec<String>,
+  h: Vec<String>,
+  l: Vec<String>,
+  c: Vec<String>,
+  v: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -25,7 +23,7 @@ pub struct Crawler {
 
 impl CrawlerInterface<Crawler> for Crawler {
   fn new(count: i32, symbol: &String) -> Result<String, reqwest::Error> {
-    let url = format!("https://crix-api-cdn.upbit.com/v1/crix/candles/minutes/30?code=CRIX.UPBIT.KRW-{}&count={}&ciqrandom=1633651016830", &symbol, count, );
+    let url = format!("https://pub2.bithumb.com/public/candlesticknew_trview/C0565_C0100/30M",);
     let client = reqwest::blocking::Client::builder()
       .danger_accept_invalid_certs(true)
       .build().unwrap();
@@ -36,14 +34,26 @@ impl CrawlerInterface<Crawler> for Crawler {
   }
 
   fn parse(raw_text: &str) -> Result<Crawler, serde_json::Error> {
-    let socket_upbit: Vec<StockPacket> = serde_json::from_str(&raw_text).unwrap();
-
-    Ok(Crawler{stocks: socket_upbit})
+    let origin_data: OriginalPacketRoot = serde_json::from_str(&raw_text).unwrap();
+    let mut packets: Vec<StockPacket> = Vec::new();
+    
+    for (i, x) in origin_data.data.v.iter().enumerate() {
+      packets.push(StockPacket {
+        opening_price: origin_data.data.o[i].parse::<f64>().unwrap(),
+        trade_price: origin_data.data.c[i].parse::<f64>().unwrap(),
+        high_price: origin_data.data.h[i].parse::<f64>().unwrap(),
+        low_price: origin_data.data.l[i].parse::<f64>().unwrap(),
+      });
+    };
+    
+    Ok(Crawler {
+      stocks: packets,
+    })
   }
 
   fn show(&self) {
-      for stock in &self.stocks {
-      println!("tradePrice: {:?}", stock.tradePrice);
+    for stock in &self.stocks {
+      println!("tradePrice: {:?}, hightPrice: {:?}, lowPrice: {:?}, openningPrice: {:?}", stock.trade_price,  stock.high_price,  stock.low_price,  stock.opening_price);
     }
   }
 }

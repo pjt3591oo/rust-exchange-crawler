@@ -2,10 +2,10 @@ mod cli;
 mod exchange;
 use cli::{parse, Params};
 
-use crate::exchange::{upbit, bithumb, cobit, CrawlerInterface};
+use crate::exchange::{upbit, bithumb, korbit, CrawlerInterface};
 use upbit::{ Crawler as UpbitCrawler};
-use bithumb::{ Crawler as bithumbCrawler };
-use cobit::{ Crawler as cobitCrawler };
+use bithumb::{ Crawler as BithumbCrawler };
+use korbit::{ Crawler as KorbitCrawler };
 
 fn main() {
   let params: Params = match parse() {
@@ -22,14 +22,12 @@ fn main() {
     let stocks: UpbitCrawler = UpbitCrawler::parse(&raw_text).unwrap();
     stocks.show();
   } else if params.exchange == "bithumb" {
-    let raw_text: String = bithumbCrawler::new(params.count, &params.symbol).unwrap();
-    let stocks: bithumbCrawler = bithumbCrawler::parse(&raw_text).unwrap();
+    let raw_text: String = BithumbCrawler::new(params.count, &params.symbol).unwrap();
+    let stocks: BithumbCrawler = BithumbCrawler::parse(&raw_text).unwrap();
     stocks.show();
   } else {
-    let raw_text: String = cobitCrawler::new(params.count, &params.symbol).unwrap();
-    let stocks: cobitCrawler = cobitCrawler::parse(&raw_text).unwrap();
+    let raw_text: String = KorbitCrawler::new(params.count, &params.symbol).unwrap();
+    let stocks: KorbitCrawler = KorbitCrawler::parse(&raw_text).unwrap();
     stocks.show();
   }
-  
-  
 }

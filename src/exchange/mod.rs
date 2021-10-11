@@ -1,6 +1,6 @@
 pub mod crawler;
 pub mod upbit;
-pub mod cobit;
+pub mod korbit;
 pub mod bithumb;
 
-pub use crawler::CrawlerInterface;
+pub use crawler::{CrawlerInterface, StockPacket};
