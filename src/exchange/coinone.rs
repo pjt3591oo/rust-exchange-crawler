@@ -1,6 +1,3 @@
-use std::collections::HashMap;
-use std::time::{SystemTime, UNIX_EPOCH};
-
 use reqwest;
 use serde::{Serialize, Deserialize};
 
@@ -25,14 +22,14 @@ pub struct Crawler {
 }
 
 impl CrawlerInterface<Crawler> for Crawler {
-  fn new(count: i32, _symbol: &String) -> Result<String, reqwest::Error> {
-    let mut symbol = String::from("");
-
-    if _symbol != "BTC" {
-      symbol = (&_symbol).to_string();
-    }
+  fn new(_count: i32, _symbol: &String) -> Result<String, reqwest::Error> {
+    let symbol: &str = if _symbol == "BTC" {
+      ""
+    } else {
+      _symbol
+    };
     
-    let url = format!("https://tb.coinone.co.kr/api/v1/chart/olhc/?site=coinone{}&type=1m&last_time=1633903440000", &symbol);
+    let url: String = format!("https://tb.coinone.co.kr/api/v1/chart/olhc/?site=coinone{}&type=1m&last_time=1633903440000", &symbol);
 
     let client = reqwest::blocking::Client::builder()
       .danger_accept_invalid_certs(true)
